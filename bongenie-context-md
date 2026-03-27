@@ -1,0 +1,123 @@
+# Bongenie Context — Agent Spec IA
+> Fichier de référence pour enrichir le prompt de l'Agent Spec IA.
+> À mettre à jour régulièrement et partager au pôle T&T pour réinjection dans le prompt.
+> Dernière mise à jour : mars 2026
+
+---
+
+## 1. DÉPARTEMENTS ET MISSIONS
+
+| Département | Missions clés |
+|---|---|
+| **Transformation & Technologie (T&T)** | IT applicatif, infra, Business Analysts, chefs de projet, DSI. Au cœur de toutes les évolutions outils, sécurité et gouvernance de la donnée. Destinataire de toutes les spécifications fonctionnelles. |
+| **Commercial** | E-commerce, omnicanalité, acheteurs. Pilotage de l'offre, stratégie commerciale, chiffre d'affaires. Data analyst dédié au pilotage des offres. |
+| **Marketing** | Pôle créatif (offline, campagnes institutionnelles), CRM, Traffic Manager, copywriting, trade marketing, communication et événementiel. |
+| **Logistique** | Tous les flux produits : enrichissements e-commerce, traitement de la marchandise, expédition des commandes, réassort. |
+| **Finance** | Comptabilité, service clients, paie (payroll). |
+| **Direction** | Direction générale et assistantes de direction. |
+| **Ressources Humaines** | RH généraliste. |
+| **Forces de vente** | Personnel en magasin et en restauration. |
+
+---
+
+## 2. STACK SI
+
+### Architecture centrale
+| Outil | Rôle | Criticité |
+|---|---|---|
+| **Business Central** | ERP — gère clients, commandes, retours, stocks, prix, autorisations (FAC, KDO, CBRW, VOUCHER) | 🔴 Critique |
+| **ESB** | Bus d'intégration — orchestre TOUS les flux entre Business Central, Sylius, Salesforce et les autres outils | 🔴 Critique |
+| **Sylius** | Moteur e-commerce (hub central) — reçoit mises à jour client, commandes, stocks, prix depuis l'ESB | 🔴 Critique |
+
+### CRM & Communication
+| Outil | Rôle |
+|---|---|
+| **Salesforce** | CRM — emails transactionnels, préférences communication, wallet update |
+| **Captain Wallet** | Mobile Wallet |
+| **Postman** | Emulation & Testing |
+
+### Produit & Contenu
+| Outil | Rôle |
+|---|---|
+| **Akeneo** | PIM (Product Information Management) — données produit froides vers Sylius |
+| **Bee App** | Génération de contenu produit par IA → alimente Akeneo |
+| **Keepeek** | Data Asset Management — assets marketing |
+| **Middleware** | Transformation et archivage des informations produit et médias |
+| **Sanity** | CMS / Content — menus, home pages, landing pages, contenu personnalisé |
+| **Lokalise** | Traductions |
+
+### E-commerce & Merchandising
+| Outil | Rôle |
+|---|---|
+| **Attraqt** | Merchandising / Searchandising — ranking produits, recommandations, résultats de recherche |
+| **Channable** | Product feed management |
+| **Redirection.io** | Gestion des redirections URL |
+| **Optimi** | Content Delivery Network |
+| **Bridge** | Store Locator — infos magasins, horaires, événements |
+
+### Paiement & Finance
+| Outil | Rôle |
+|---|---|
+| **Safepay** | Paiement + 3D Secure |
+| **CRIF** | Solvency check (vérification solvabilité) |
+
+### Monitoring & Infrastructure
+| Outil | Rôle |
+|---|---|
+| **New Relic** | Monitoring |
+| **Azure** | Blob Storage |
+| **Clarity** | Heatmaps & Sessions recording |
+| **Smart Tribune** | FAQ dynamique et contextuelle |
+
+### Pricing
+| Outil | Rôle |
+|---|---|
+| **ODR** | Offre De Remise — fichier de gestion des prix rouges |
+| **603** | Site e-commerce full price |
+| **605** | Site e-commerce outlet |
+
+---
+
+## 3. PROJETS STRUCTURANTS EN COURS
+
+| Projet | Période | Impact |
+|---|---|---|
+| Restructuration organisationnelle | Q1 2026 (en cours) | Ressources potentiellement contraintes |
+| Montée de version majeure Sylius | Avril – Septembre 2026 | ⚠️ Tout besoin touchant Sylius pendant cette période = risque fort de conflit |
+| Montée de version ERP (Business Central) | Dès mai 2026 | ⚠️ Tout besoin touchant l'ERP ou l'ESB à partir de mai 2026 = risque fort de conflit |
+
+> **Règle BA** : tout besoin avec une deadline entre avril et septembre 2026 doit être évalué au regard de ces chantiers. Le signaler systématiquement dans les contraintes et la recommandation BA.
+
+---
+
+## 4. VOCABULAIRE INTERNE
+
+| Terme | Définition |
+|---|---|
+| **Prix noir** | Prix plein (sans remise) |
+| **Prix rouge** | Prix remisé |
+| **ODR** | Offre De Remise — fichier de gestion des prix rouges |
+| **603** | Site e-commerce full price |
+| **605** | Site e-commerce outlet |
+| **T&T** | Pôle Transformation & Technologie |
+
+---
+
+## 5. RÈGLES DE DÉPENDANCES SI (pour les questions BA)
+
+| Si le besoin touche... | Dépendances à vérifier |
+|---|---|
+| Prix, commandes, stocks, clients | Business Central + ESB |
+| E-commerce (front, tunnel d'achat, compte client) | Sylius (+ alerte chantier avril–sept 2026) |
+| Catalogue produit, enrichissement | Akeneo, Keepeek, Bee App |
+| Pages, contenu, CMS | Sanity |
+| CRM, emails, fidélité | Salesforce |
+| Merchandising, recherche | Attraqt |
+| Évolution multi-outils | ESB obligatoirement — complexité accrue |
+| Traductions | Lokalise |
+| Paiement | Safepay |
+
+---
+
+*Ce fichier est maintenu par Manon — pôle Transformation & Technologie.*
+*Pour toute mise à jour : partager les évolutions au pôle T&T pour réinjection dans le prompt de l'agent.*
