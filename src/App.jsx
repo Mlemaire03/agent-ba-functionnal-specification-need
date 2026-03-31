@@ -165,7 +165,7 @@ RÈGLES JSON CRITIQUES :
 const TypingDots = () => (
   <div style={{ display: "flex", gap: 4, alignItems: "center", padding: "10px 4px" }}>
     {[0,1,2].map(i => (
-      <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: "#2563eb", animation: "blink 1.2s ease-in-out infinite", animationDelay: `${i*0.2}s` }} />
+      <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: "#b8963e", animation: "blink 1.2s ease-in-out infinite", animationDelay: `${i*0.2}s` }} />
     ))}
     <style>{`@keyframes blink{0%,80%,100%{opacity:0.2}40%{opacity:1}}`}</style>
   </div>
@@ -191,10 +191,10 @@ const EditableField = ({ value, onChange, multiline = false, placeholder = "" })
 
   if (!editing) return (
     <div onClick={() => setEditing(true)} style={{ cursor: "text", padding: "6px 8px", borderRadius: 5, border: "1px dashed transparent", transition: "all 0.15s", fontSize: 13, color: val ? "#374151" : "#9ca3af", lineHeight: 1.65, minHeight: 28 }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = "#93c5fd"}
+      onMouseEnter={e => e.currentTarget.style.borderColor = "#b8963e"}
       onMouseLeave={e => e.currentTarget.style.borderColor = "transparent"}>
       {val || placeholder || "Cliquer pour éditer..."}
-      <span style={{ fontSize: 10, color: "#93c5fd", marginLeft: 6, fontFamily: "sans-serif" }}>✏️</span>
+      <span style={{ fontSize: 10, color: "#b8963e", marginLeft: 6, fontFamily: "sans-serif" }}>✏️</span>
     </div>
   );
 
@@ -220,26 +220,26 @@ function SpecDoc({ spec, onUpdate, validated, onValidate }) {
   const Section = ({ num, title, editable = true, children, noBorder = false }) => (
     <div style={{ marginBottom: 24 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, paddingBottom: 6, borderBottom: noBorder ? "none" : "1px solid #e5e7eb" }}>
-        <span style={{ background: validated ? "#1e3a5f" : "#2563eb", color: "white", width: 22, height: 22, borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, flexShrink: 0, fontFamily: "sans-serif" }}>{num}</span>
+        <span style={{ background: "#1a3a2a", color: "white", width: 22, height: 22, borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, flexShrink: 0, fontFamily: "sans-serif" }}>{num}</span>
         <span style={{ fontSize: 14, fontWeight: 800, color: "#111827", letterSpacing: "-0.01em", fontFamily: "sans-serif" }}>{title}</span>
-        {editable && !validated && <span style={{ fontSize: 10, color: "#93c5fd", fontFamily: "sans-serif" }}>— éditable</span>}
+        {editable && !validated && <span style={{ fontSize: 10, color: "#b8963e", fontFamily: "sans-serif" }}>— éditable</span>}
       </div>
       {children}
     </div>
   );
 
   return (
-    <div id="spec-doc" style={{ background: "white", borderRadius: 12, overflow: "hidden", border: "1px solid #dbeafe", maxWidth: 700, boxShadow: "0 4px 24px rgba(37,99,235,0.07)" }}>
+    <div id="spec-doc" style={{ background: "white", borderRadius: 12, overflow: "hidden", border: "1px solid #e8f0eb", maxWidth: 700, boxShadow: "0 4px 24px rgba(37,99,235,0.07)" }}>
 
       {/* Header */}
-      <div style={{ background: "linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%)", padding: "28px 32px" }}>
-        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "#93c5fd", marginBottom: 8, fontFamily: "sans-serif" }}>
+      <div style={{ background: "linear-gradient(135deg, #1a3a2a 0%, #2d5a40 100%)", padding: "28px 32px" }}>
+        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "#b8963e", marginBottom: 8, fontFamily: "sans-serif" }}>
           Spécification Fonctionnelle — Version 1.0
         </div>
         <div style={{ fontSize: 21, fontWeight: 700, color: "white", lineHeight: 1.2, marginBottom: 6, letterSpacing: "-0.02em" }}>
           {spec.titre_projet || "Titre du projet"}
         </div>
-        <div style={{ fontSize: 11, color: "#93c5fd", fontFamily: "sans-serif", marginBottom: 20 }}>
+        <div style={{ fontSize: 11, color: "#b8963e", fontFamily: "sans-serif", marginBottom: 20 }}>
           À destination du pôle Transformation &amp; Technologie
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "10px 24px" }}>
@@ -250,8 +250,8 @@ function SpecDoc({ spec, onUpdate, validated, onValidate }) {
             ["Date", today],
           ].map(([k, v]) => (
             <div key={k}>
-              <div style={{ fontSize: 9, color: "#60a5fa", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "sans-serif", marginBottom: 2 }}>{k}</div>
-              <div style={{ fontSize: 12, color: "#dbeafe", fontFamily: "sans-serif" }}>{v || "—"}</div>
+              <div style={{ fontSize: 9, color: "#d4a820", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "sans-serif", marginBottom: 2 }}>{k}</div>
+              <div style={{ fontSize: 12, color: "#e8f0eb", fontFamily: "sans-serif" }}>{v || "—"}</div>
             </div>
           ))}
         </div>
@@ -264,7 +264,7 @@ function SpecDoc({ spec, onUpdate, validated, onValidate }) {
           <div style={{ flex: 1, fontSize: 12, color: "#92400e", fontFamily: "sans-serif", lineHeight: 1.5 }}>
             <strong>Relecture requise</strong> — Vérifiez et corrigez les informations ci-dessous avant validation. Cliquez sur un champ pour l'éditer.
           </div>
-          <button onClick={onValidate} style={{ background: "#1e3a5f", color: "white", border: "none", padding: "9px 18px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "sans-serif", whiteSpace: "nowrap" }}>
+          <button onClick={onValidate} style={{ background: "#1a3a2a", color: "white", border: "none", padding: "9px 18px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "sans-serif", whiteSpace: "nowrap" }}>
             ✓ Valider le document
           </button>
         </div>
@@ -378,7 +378,7 @@ function SpecDoc({ spec, onUpdate, validated, onValidate }) {
                 {/* Questions IA — toujours en lecture seule */}
                 {spec.questions_ouvertes?.map((q, i) => (
                   <div key={`ia-${i}`} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                    <span style={{ background: "#2563eb", color: "white", width: 20, height: 20, borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, flexShrink: 0, fontFamily: "sans-serif" }}>{i+1}</span>
+                    <span style={{ background: "#1a3a2a", color: "white", width: 20, height: 20, borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, flexShrink: 0, fontFamily: "sans-serif" }}>{i+1}</span>
                     <span style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, flex: 1 }}>{q}</span>
                   </div>
                 ))}
@@ -432,8 +432,8 @@ function SpecDoc({ spec, onUpdate, validated, onValidate }) {
 
       </div>
 
-      <div style={{ padding: "12px 32px", background: "#f8faff", borderTop: "1px solid #dbeafe", textAlign: "center", fontSize: 11, color: "#9ca3af", fontFamily: "sans-serif" }}>
-        Agent Spec IA — Pôle Transformation &amp; Technologie · Document à valider avant transmission
+      <div style={{ padding: "12px 32px", background: "#f7f5f1", borderTop: "1px solid #e8f0eb", textAlign: "center", fontSize: 11, color: "#9ca3af", fontFamily: "sans-serif" }}>
+        Grace · Définition du besoin — Pôle Transformation &amp; Technologie · Document à valider avant transmission
       </div>
     </div>
   );
@@ -454,7 +454,7 @@ function FeedbackModal({ onClose }) {
         <div style={{ fontSize: 48, marginBottom: 16 }}>🙏</div>
         <div style={{ fontSize: 18, fontWeight: 800, color: "#111827", marginBottom: 8, fontFamily: "sans-serif" }}>Merci pour votre retour !</div>
         <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 24, fontFamily: "sans-serif", lineHeight: 1.5 }}>Votre feedback nous aide à améliorer l'agent pour mieux répondre aux besoins du pôle métier.</div>
-        <button onClick={onClose} style={{ background: "#1e3a5f", color: "white", border: "none", padding: "10px 24px", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "sans-serif" }}>Fermer</button>
+        <button onClick={onClose} style={{ background: "#1a3a2a", color: "white", border: "none", padding: "10px 24px", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "sans-serif" }}>Fermer</button>
       </div>
     </div>
   );
@@ -480,7 +480,7 @@ function FeedbackModal({ onClose }) {
           ))}
         </div>
         {(hover || rating) > 0 && (
-          <div style={{ textAlign: "center", fontSize: 13, color: "#2563eb", fontWeight: 600, fontFamily: "sans-serif", marginBottom: 16 }}>{labels[hover || rating]}</div>
+          <div style={{ textAlign: "center", fontSize: 13, color: "#1a3a2a", fontWeight: 600, fontFamily: "sans-serif", marginBottom: 16 }}>{labels[hover || rating]}</div>
         )}
 
         {/* Questions */}
@@ -508,7 +508,7 @@ function FeedbackModal({ onClose }) {
           style={{ width: "100%", border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 12px", fontSize: 13, fontFamily: "sans-serif", resize: "none", outline: "none", color: "#374151", marginBottom: 16 }} />
 
         <button onClick={() => setSent(true)} disabled={rating === 0}
-          style={{ width: "100%", background: rating > 0 ? "#1e3a5f" : "#e5e7eb", color: rating > 0 ? "white" : "#9ca3af", border: "none", padding: "12px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: rating > 0 ? "pointer" : "default", fontFamily: "sans-serif", transition: "background 0.15s" }}>
+          style={{ width: "100%", background: rating > 0 ? "#1a3a2a" : "#e5e7eb", color: rating > 0 ? "white" : "#9ca3af", border: "none", padding: "12px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: rating > 0 ? "pointer" : "default", fontFamily: "sans-serif", transition: "background 0.15s" }}>
           Envoyer mon évaluation
         </button>
       </div>
@@ -517,7 +517,7 @@ function FeedbackModal({ onClose }) {
 }
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
-export default function AgentSpecV3() {
+export default function GraceDefinitionBesoin() {
   const [phase, setPhase] = useState("landing");
   const [messages, setMessages] = useState([]);
   const [history, setHistory] = useState([]);
@@ -691,62 +691,61 @@ export default function AgentSpecV3() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f0f4ff", fontFamily: "sans-serif", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: "#f7f5f1", fontFamily: "sans-serif", display: "flex", flexDirection: "column" }}>
       <style>{`*{box-sizing:border-box} @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}} textarea:focus,input:focus{outline:none}`}</style>
 
       {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} />}
 
       {/* Header */}
-      <div style={{ background: "#1e3a5f", padding: "15px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10, flexShrink: 0 }}>
+      <div style={{ background: "#1a3a2a", padding: "15px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10, flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 8, height: 8, borderRadius: "50%", background: phase === "chat" ? "#4ade80" : "#475569", boxShadow: phase === "chat" ? "0 0 8px #4ade80" : "none", transition: "all 0.3s" }} />
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "white", letterSpacing: "-0.01em" }}>Agent Spec IA</div>
-            <div style={{ fontSize: 10, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.12em" }}>Pôle Transformation & Technologie</div>
+            <div style={{ fontSize: 20, fontWeight: 300, color: "#b8963e", letterSpacing: "0.14em", fontFamily: "Georgia, serif" }}>GRACE</div>
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: "0.18em" }}>Définition du besoin</div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          {phase === "done" && <button onClick={() => setShowFeedback(true)} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "#93c5fd", fontSize: 12, padding: "7px 14px", borderRadius: 7, cursor: "pointer" }}>💬 Feedback</button>}
+          {phase === "done" && <button onClick={() => setShowFeedback(true)} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "#b8963e", fontSize: 12, padding: "7px 14px", borderRadius: 7, cursor: "pointer" }}>💬 Feedback</button>}
           {phase !== "landing" && <button onClick={reset} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", fontSize: 12, padding: "7px 14px", borderRadius: 7, cursor: "pointer" }}>↺ Nouveau</button>}
         </div>
       </div>
 
       {/* LANDING */}
       {phase === "landing" && (
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "#f7f5f1" }}>
           <div style={{ maxWidth: 500, width: "100%", animation: "fadeUp 0.4s ease" }}>
-            <div style={{ textAlign: "center", marginBottom: 28 }}>
-              <div style={{ fontSize: 44, marginBottom: 14 }}>📋</div>
-              <h1 style={{ fontSize: 24, fontWeight: 800, color: "#111827", margin: "0 0 10px", letterSpacing: "-0.03em", lineHeight: 1.2 }}>
-                Soumettez votre besoin au pôle<br/><span style={{ color: "#2563eb" }}>Transformation & Technologie</span>
-              </h1>
-              <p style={{ fontSize: 13, color: "#6b7280", lineHeight: 1.65, margin: "0 auto", maxWidth: 400 }}>
-                Un agent BA vous guide avec les bonnes questions pour produire une première ébauche de spécification fonctionnelle en 10 minutes.
+            <div style={{ textAlign: "center", marginBottom: 32 }}>
+              <div style={{ fontFamily: "Georgia, serif", fontSize: 48, fontWeight: 300, color: "#1a3a2a", letterSpacing: "0.2em", marginBottom: 4 }}>GRACE</div>
+              <div style={{ fontSize: 11, color: "#7a756e", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 24 }}>Définition du besoin</div>
+              <div style={{ width: 40, height: 2, background: "#b8963e", margin: "0 auto 24px" }}></div>
+              <p style={{ fontSize: 13, color: "#7a756e", lineHeight: 1.65, margin: "0 auto", maxWidth: 400 }}>
+                Un entretien guidé pour structurer votre besoin et produire une première ébauche de spécification fonctionnelle à destination du pôle Transformation & Technologie.
               </p>
             </div>
 
-            {error && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "12px 16px", fontSize: 13, color: "#dc2626", marginBottom: 16 }}>{error}</div>}
+            {error && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 4, padding: "12px 16px", fontSize: 13, color: "#dc2626", marginBottom: 16 }}>{error}</div>}
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 9, marginBottom: 24 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 28 }}>
               {[
                 ["🎯", "Entretien guidé", "Questions ciblées pour structurer votre besoin, même s'il est peu défini."],
                 ["✏️", "Document éditable", "Relisez et corrigez la spécification générée avant de la valider."],
-                ["📄", "Téléchargement PDF", "Exportez le document finalisé à destination du pôle T&T."],
+                ["📄", "Téléchargement", "Exportez le document finalisé à destination du pôle T&T."],
               ].map(([icon, title, desc]) => (
-                <div key={title} style={{ display: "flex", gap: 12, background: "white", border: "1px solid #dbeafe", borderRadius: 10, padding: "11px 15px", alignItems: "flex-start" }}>
+                <div key={title} style={{ display: "flex", gap: 12, background: "white", border: "1px solid #e8f0eb", borderLeft: "3px solid #b8963e", padding: "11px 15px", alignItems: "flex-start" }}>
                   <span style={{ fontSize: 17, flexShrink: 0 }}>{icon}</span>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#111827", marginBottom: 1 }}>{title}</div>
-                    <div style={{ fontSize: 12, color: "#6b7280", lineHeight: 1.5 }}>{desc}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#1a3a2a", marginBottom: 1 }}>{title}</div>
+                    <div style={{ fontSize: 12, color: "#7a756e", lineHeight: 1.5 }}>{desc}</div>
                   </div>
                 </div>
               ))}
             </div>
 
             <button onClick={start}
-              style={{ width: "100%", background: "#1e3a5f", color: "white", border: "none", padding: "14px 24px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", transition: "background 0.15s" }}
-              onMouseEnter={e => e.target.style.background = "#2563eb"}
-              onMouseLeave={e => e.target.style.background = "#1e3a5f"}>
+              style={{ width: "100%", background: "#1a3a2a", color: "white", border: "none", padding: "14px 24px", borderRadius: 2, fontSize: 13, fontWeight: 500, cursor: "pointer", letterSpacing: "0.08em", transition: "background 0.15s" }}
+              onMouseEnter={e => e.target.style.background = "#2d5a40"}
+              onMouseLeave={e => e.target.style.background = "#1a3a2a"}>
               Démarrer l'entretien →
             </button>
           </div>
@@ -762,10 +761,10 @@ export default function AgentSpecV3() {
                 <div key={i} style={{ display: "flex", justifyContent: msg.role === "user" ? "flex-end" : "flex-start", animation: "fadeUp 0.2s ease" }}>
                   <div style={{
                     maxWidth: "80%",
-                    background: msg.role === "user" ? "#1e3a5f" : "white",
+                    background: msg.role === "user" ? "#1a3a2a" : "white",
                     color: msg.role === "user" ? "white" : "#111827",
                     padding: "11px 16px", borderRadius: msg.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
-                    fontSize: 14, lineHeight: 1.65, border: msg.role === "user" ? "none" : "1px solid #dbeafe",
+                    fontSize: 14, lineHeight: 1.65, border: msg.role === "user" ? "none" : "1px solid #e8f0eb",
                     boxShadow: "0 1px 3px rgba(0,0,0,0.05)", whiteSpace: "pre-wrap"
                   }}>
                     {msg.content}
@@ -775,7 +774,7 @@ export default function AgentSpecV3() {
 
               {loading && (
                 <div style={{ display: "flex" }}>
-                  <div style={{ background: "white", border: "1px solid #dbeafe", borderRadius: "14px 14px 14px 4px", padding: "4px 12px" }}>
+                  <div style={{ background: "white", border: "1px solid #e8f0eb", borderRadius: "14px 14px 14px 4px", padding: "4px 12px" }}>
                     <TypingDots />
                   </div>
                 </div>
@@ -786,12 +785,12 @@ export default function AgentSpecV3() {
                   <SpecDoc spec={spec} onUpdate={setSpec} validated={validated} onValidate={handleValidate} />
                   {validated && (
                     <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
-                      <button onClick={downloadPDF} style={{ flex: 1, minWidth: 180, background: "#1e3a5f", color: "white", border: "none", padding: "13px 20px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", transition: "background 0.15s" }}
-                        onMouseEnter={e => e.target.style.background = "#2563eb"}
-                        onMouseLeave={e => e.target.style.background = "#1e3a5f"}>
+                      <button onClick={downloadPDF} style={{ flex: 1, minWidth: 180, background: "#1a3a2a", color: "white", border: "none", padding: "13px 20px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", transition: "background 0.15s" }}
+                        onMouseEnter={e => e.target.style.background = "#1a3a2a"}
+                        onMouseLeave={e => e.target.style.background = "#1a3a2a"}>
                         ⬇ Télécharger le document
                       </button>
-                      <button onClick={() => setShowFeedback(true)} style={{ background: "white", color: "#1e3a5f", border: "1px solid #dbeafe", padding: "13px 20px", borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+                      <button onClick={() => setShowFeedback(true)} style={{ background: "white", color: "#1a3a2a", border: "1px solid #e8f0eb", padding: "13px 20px", borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
                         💬 Faire un feedback
                       </button>
                       <button onClick={reset} style={{ background: "white", color: "#6b7280", border: "1px solid #e5e7eb", padding: "13px 20px", borderRadius: 10, fontSize: 14, cursor: "pointer" }}>
@@ -812,13 +811,13 @@ export default function AgentSpecV3() {
           </div>
 
           {phase === "chat" && (
-            <div style={{ background: "white", borderTop: "1px solid #dbeafe", padding: "14px 16px", flexShrink: 0 }}>
+            <div style={{ background: "white", borderTop: "1px solid #e8f0eb", padding: "14px 16px", flexShrink: 0 }}>
               <div style={{ maxWidth: 740, margin: "0 auto" }}>
                 {/* Bouton Générer — affiché quand l'entretien est terminé */}
                 {readyToGenerate && !loading && (
                   <div style={{ marginBottom: 12, animation: "fadeUp 0.3s ease" }}>
                     <button onClick={triggerGenerate}
-                      style={{ width: "100%", background: "linear-gradient(135deg, #1e3a5f, #2563eb)", color: "white", border: "none", padding: "14px 24px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 4px 14px rgba(37,99,235,0.3)" }}>
+                      style={{ width: "100%", background: "linear-gradient(135deg, #1a3a2a, #2d5a40)", color: "white", border: "none", padding: "14px 24px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 4px 14px rgba(37,99,235,0.3)" }}>
                       <span style={{ fontSize: 18 }}>📋</span>
                       Générer ma spécification fonctionnelle
                     </button>
@@ -831,9 +830,9 @@ export default function AgentSpecV3() {
                   <textarea ref={inputRef} value={input}
                     onChange={e => { setInput(e.target.value); e.target.style.height = "auto"; e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px"; }}
                     onKeyDown={handleKey} placeholder={readyToGenerate ? "Précisions supplémentaires ? (optionnel)" : "Votre réponse... (Entrée pour envoyer)"} rows={1} disabled={loading}
-                    style={{ flex: 1, border: "1px solid #dbeafe", borderRadius: 10, padding: "11px 14px", fontSize: 14, fontFamily: "sans-serif", resize: "none", lineHeight: 1.5, background: "#f8faff", color: "#111827", minHeight: 44, maxHeight: 120, transition: "border-color 0.15s" }} />
+                    style={{ flex: 1, border: "1px solid #e8e0d3", borderRadius: 4, padding: "11px 14px", fontSize: 14, fontFamily: "sans-serif", resize: "none", lineHeight: 1.5, background: "#f7f5f1", color: "#111827", minHeight: 44, maxHeight: 120, transition: "border-color 0.15s" }} />
                   <button onClick={send} disabled={!input.trim() || loading}
-                    style={{ background: input.trim() && !loading ? "#2563eb" : "#e5e7eb", color: input.trim() && !loading ? "white" : "#9ca3af", border: "none", width: 44, height: 44, borderRadius: 10, cursor: input.trim() && !loading ? "pointer" : "default", fontSize: 18, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}>
+                    style={{ background: input.trim() && !loading ? "#2d5a40" : "#e5e7eb", color: input.trim() && !loading ? "white" : "#9ca3af", border: "none", width: 44, height: 44, borderRadius: 10, cursor: input.trim() && !loading ? "pointer" : "default", fontSize: 18, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}>
                     →
                   </button>
                 </div>
