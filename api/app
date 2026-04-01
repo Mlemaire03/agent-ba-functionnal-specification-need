@@ -443,77 +443,151 @@ function SpecDoc({ spec, onUpdate, validated, onValidate, onUnvalidate }) {
 }
 
 // ─── FEEDBACK MODAL ───────────────────────────────────────────────────────────
-function FeedbackModal({ onClose }) {
+function FeedbackModal({ onClose, spec }) {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
-  const [comment, setComment] = useState("");
+  const [questionsPertinentes, setQuestionsPertinentes] = useState(null);
+  const [specSatisfaisante, setSpecSatisfaisante] = useState(null);
+  const [pointAmeliorer, setPointAmeliorer] = useState("");
+  const [feraitAppel, setFeraitAppel] = useState(null);
+  const [commentaire, setCommentaire] = useState("");
+  const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState(null);
 
   const labels = ["", "Insuffisant", "Passable", "Correct", "Bien", "Excellent"];
 
+  const canSubmit = rating > 0;
+
+  const submit = async () => {
+    if (!canSubmit || sending) return;
+    setSending(true); setError(null);
+    try {
+      const res = await fetch("/api/feedback-entretien", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nom: spec?.prenom_nom || "—",
+          departement: spec?.departement || "—",
+          titreProjet: spec?.titre_projet || "—",
+          date: new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }),
+          questionsPertinentes: questionsPertinentes || "Non répondu",
+          specSatisfaisante: specSatisfaisante || "Non répondu",
+          pointAmeliorer: pointAmeliorer || "",
+          feraitAppel: feraitAppel || "Non répondu",
+          noteSatisfaction: rating,
+          commentaire: commentaire || "",
+        })
+      });
+      const data = await res.json();
+      if (data.success) { setSent(true); }
+      else { setError("Erreur lors de l'envoi. Réessayez."); }
+    } catch (e) {
+      setError("Erreur réseau. Réessayez.");
+    }
+    setSending(false);
+  };
+
+  const YesNo = ({ value, onChange }) => (
+    <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+      {[["Oui", "👍"], ["Non", "👎"]].map(([label, emoji]) => (
+        <span key={label} onClick={() => onChange(label)}
+          style={{ fontSize: 20, cursor: "pointer", opacity: value && value !== label ? 0.25 : 1, transition: "opacity 0.15s" }}>
+          {emoji}
+        </span>
+      ))}
+    </div>
+  );
+
+  const overlay = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 24 };
+  const modal = { background: "white", borderRadius: 12, padding: "28px 28px 24px", maxWidth: 460, width: "100%", maxHeight: "90vh", overflowY: "auto" };
+
   if (sent) return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 24 }}>
-      <div style={{ background: "white", borderRadius: 16, padding: "40px 32px", maxWidth: 400, width: "100%", textAlign: "center" }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>🙏</div>
-        <div style={{ fontSize: 18, fontWeight: 800, color: "#111827", marginBottom: 8, fontFamily: "sans-serif" }}>Merci pour votre retour !</div>
-        <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 24, fontFamily: "sans-serif", lineHeight: 1.5 }}>Votre feedback nous aide à améliorer l'agent pour mieux répondre aux besoins du pôle métier.</div>
-        <button onClick={onClose} style={{ background: "#1a3a2a", color: "white", border: "none", padding: "10px 24px", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "sans-serif" }}>Fermer</button>
+    <div style={overlay}>
+      <div style={{ ...modal, textAlign: "center", padding: "40px 32px" }}>
+        <div style={{ fontSize: 44, marginBottom: 16 }}>🙏</div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: "#111827", marginBottom: 8, fontFamily: "sans-serif" }}>Merci pour votre retour !</div>
+        <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 24, fontFamily: "sans-serif", lineHeight: 1.6 }}>Votre évaluation a bien été enregistrée et sera exploitée par le pôle T&T.</div>
+        <button onClick={onClose} style={{ background: "#1a3a2a", color: "white", border: "none", padding: "10px 28px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "sans-serif" }}>Fermer</button>
       </div>
     </div>
   );
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 24 }}>
-      <div style={{ background: "white", borderRadius: 16, padding: "32px", maxWidth: 440, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+    <div style={overlay}>
+      <div style={modal}>
+
+        {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: "#111827", fontFamily: "sans-serif", marginBottom: 4 }}>Évaluer cet entretien</div>
-            <div style={{ fontSize: 12, color: "#6b7280", fontFamily: "sans-serif" }}>Votre retour nous aide à améliorer l'agent</div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#2d5a40", fontFamily: "sans-serif", marginBottom: 4 }}>Grace — Définition du besoin</div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: "#111827", fontFamily: "sans-serif" }}>Évaluer cet entretien</div>
           </div>
-          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#9ca3af" }}>✕</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#9ca3af", flexShrink: 0 }}>✕</button>
         </div>
 
-        {/* Étoiles */}
-        <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 8 }}>
-          {[1,2,3,4,5].map(s => (
-            <span key={s} onClick={() => setRating(s)} onMouseEnter={() => setHover(s)} onMouseLeave={() => setHover(0)}
-              style={{ fontSize: 32, cursor: "pointer", transition: "transform 0.1s", transform: (hover || rating) >= s ? "scale(1.15)" : "scale(1)" }}>
-              {(hover || rating) >= s ? "⭐" : "☆"}
-            </span>
-          ))}
-        </div>
-        {(hover || rating) > 0 && (
-          <div style={{ textAlign: "center", fontSize: 13, color: "#1a3a2a", fontWeight: 600, fontFamily: "sans-serif", marginBottom: 16 }}>{labels[hover || rating]}</div>
-        )}
-
-        {/* Questions */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
-          {[
-            "Les questions posées étaient pertinentes",
-            "Le document généré reflète bien mon besoin",
-            "Je referai appel à cet agent pour une prochaine demande",
-          ].map((q, i) => {
-            const [v, setV] = useState(null);
-            return (
-              <div key={i} style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 12, color: "#374151", fontFamily: "sans-serif", flex: 1 }}>{q}</span>
-                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                  {["👍", "👎"].map(e => (
-                    <span key={e} onClick={() => setV(e)} style={{ fontSize: 18, cursor: "pointer", opacity: v && v !== e ? 0.3 : 1, transition: "opacity 0.15s" }}>{e}</span>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+        {/* Q1 — questions pertinentes */}
+        <div style={{ background: "#f7f5f1", borderRadius: 8, padding: "12px 14px", marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 13, color: "#374151", fontFamily: "sans-serif", flex: 1, lineHeight: 1.5 }}>Les questions posées étaient-elles pertinentes ?</span>
+          <YesNo value={questionsPertinentes} onChange={setQuestionsPertinentes} />
         </div>
 
-        <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Un commentaire libre ? (optionnel)" rows={3}
-          style={{ width: "100%", border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 12px", fontSize: 13, fontFamily: "sans-serif", resize: "none", outline: "none", color: "#374151", marginBottom: 16 }} />
+        {/* Q2 — spec satisfaisante */}
+        <div style={{ background: "#f7f5f1", borderRadius: 8, padding: "12px 14px", marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 13, color: "#374151", fontFamily: "sans-serif", flex: 1, lineHeight: 1.5 }}>La spécification fonctionnelle vous semble-t-elle satisfaisante ?</span>
+          <YesNo value={specSatisfaisante} onChange={setSpecSatisfaisante} />
+        </div>
 
-        <button onClick={() => setSent(true)} disabled={rating === 0}
-          style={{ width: "100%", background: rating > 0 ? "#1a3a2a" : "#e5e7eb", color: rating > 0 ? "white" : "#9ca3af", border: "none", padding: "12px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: rating > 0 ? "pointer" : "default", fontFamily: "sans-serif", transition: "background 0.15s" }}>
-          Envoyer mon évaluation
+        {/* Q3 — point à améliorer */}
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ fontSize: 13, color: "#374151", fontFamily: "sans-serif", marginBottom: 6, lineHeight: 1.5 }}>Si vous deviez améliorer un point dans cet entretien, quel serait-il ?</div>
+          <input value={pointAmeliorer} onChange={e => setPointAmeliorer(e.target.value)} placeholder="Optionnel — réponse courte"
+            style={{ width: "100%", border: "1px solid #e8e0d3", borderRadius: 6, padding: "8px 12px", fontSize: 13, fontFamily: "sans-serif", outline: "none", color: "#374151", background: "#f7f5f1" }} />
+        </div>
+
+        {/* Q4 — ferait appel */}
+        <div style={{ background: "#f7f5f1", borderRadius: 8, padding: "12px 14px", marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 13, color: "#374151", fontFamily: "sans-serif", flex: 1, lineHeight: 1.5 }}>Feriez-vous de nouveau appel à Grace pour définir votre besoin ?</span>
+          <YesNo value={feraitAppel} onChange={setFeraitAppel} />
+        </div>
+
+        {/* Q5 — note étoiles */}
+        <div style={{ borderTop: "1px solid #e8e0d3", paddingTop: 16, marginBottom: 16 }}>
+          <div style={{ fontSize: 13, color: "#374151", fontFamily: "sans-serif", marginBottom: 10 }}>Quel est votre niveau de satisfaction globale de cet entretien ?</div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {[1,2,3,4,5].map(s => (
+              <span key={s} onClick={() => setRating(s)} onMouseEnter={() => setHover(s)} onMouseLeave={() => setHover(0)}
+                style={{ fontSize: 28, cursor: "pointer", transition: "transform 0.1s", transform: (hover || rating) >= s ? "scale(1.1)" : "scale(1)" }}>
+                {(hover || rating) >= s ? "⭐" : "☆"}
+              </span>
+            ))}
+            {(hover || rating) > 0 && (
+              <span style={{ fontSize: 13, color: "#2d5a40", fontWeight: 600, fontFamily: "sans-serif", marginLeft: 6 }}>{labels[hover || rating]}</span>
+            )}
+          </div>
+        </div>
+
+        {/* Commentaire libre */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 13, color: "#374151", fontFamily: "sans-serif", marginBottom: 6 }}>Commentaire libre <span style={{ color: "#9ca3af" }}>(optionnel)</span></div>
+          <textarea value={commentaire} onChange={e => setCommentaire(e.target.value)} placeholder="Un retour, une suggestion, quelque chose qui manquait…" rows={3}
+            style={{ width: "100%", border: "1px solid #e8e0d3", borderRadius: 6, padding: "8px 12px", fontSize: 13, fontFamily: "sans-serif", resize: "none", outline: "none", color: "#374151", background: "#f7f5f1" }} />
+        </div>
+
+        {/* Note confidentialité */}
+        <div style={{ fontSize: 11, color: "#9ca3af", fontFamily: "sans-serif", lineHeight: 1.6, marginBottom: 16, fontStyle: "italic" }}>
+          Ces données seront uniquement exploitées par le département T&T afin d'améliorer la qualité de ses services et répondre au mieux à vos besoins.
+        </div>
+
+        {error && <div style={{ fontSize: 12, color: "#dc2626", marginBottom: 10, fontFamily: "sans-serif" }}>⚠️ {error}</div>}
+
+        {/* Bouton envoi */}
+        <button onClick={submit} disabled={!canSubmit || sending}
+          style={{ width: "100%", background: canSubmit && !sending ? "#1a3a2a" : "#e5e7eb", color: canSubmit && !sending ? "white" : "#9ca3af", border: "none", padding: "12px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: canSubmit && !sending ? "pointer" : "default", fontFamily: "sans-serif", transition: "background 0.15s" }}>
+          {sending ? "Envoi en cours…" : "Envoyer mon évaluation"}
         </button>
+        {!canSubmit && <div style={{ fontSize: 11, color: "#b8963e", textAlign: "center", marginTop: 6, fontFamily: "sans-serif" }}>Veuillez attribuer une note étoile pour soumettre</div>}
+
       </div>
     </div>
   );
@@ -697,7 +771,7 @@ export default function GraceDefinitionBesoin() {
     <div style={{ minHeight: "100vh", background: "#f7f5f1", fontFamily: "sans-serif", display: "flex", flexDirection: "column" }}>
       <style>{`*{box-sizing:border-box} @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}} textarea:focus,input:focus{outline:none}`}</style>
 
-      {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} />}
+      {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} spec={spec} />}
 
       {/* Header */}
       <div style={{ background: "#1a3a2a", padding: "15px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10, flexShrink: 0 }}>
