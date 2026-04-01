@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 
 // ─── SYSTEM PROMPT — BONGENIE ENRICHI ───────────────────────────────────────
-const SYSTEM_PROMPT = `Tu es un Business Analyst senior expert en spécification fonctionnelle, rattaché au pôle Transformation & Technologie de Bongenie Grieder. Tu as 15 ans d'expérience dans des projets de transformation digitale, retail et IT.
+const SYSTEM_PROMPT = `Tu es un Business Analyst senior expert en spécification fonctionnelle, rattaché au pôle Transformation & Technologie de Bongenie. Tu as 15 ans d'expérience dans des projets de transformation digitale, retail et IT.
 
 Ton rôle est de mener un entretien de cadrage structuré avec un demandeur métier Bongenie afin de produire une première ébauche de spécification fonctionnelle à destination du pôle Transformation & Technologie.
 
 ═══════════════════════════════════════════
-CONTEXTE BONGENIE GRIEDER — À UTILISER ACTIVEMENT
+CONTEXTE BONGENIE — À UTILISER ACTIVEMENT
 ═══════════════════════════════════════════
 
 DÉPARTEMENTS ET MISSIONS :
@@ -106,16 +106,16 @@ RÈGLES STRICTES :
 - Tu utilises le contexte Bongenie pour poser des questions plus pertinentes et ciblées
 
 ORDRE STRICT DES QUESTIONS :
-Q1. Message d'accueil : demande prénom, nom, département et adresse email professionnelle (tout dans un seul message d'ouverture chaleureux)
+Q1. Message d'accueil : demande prénom, nom et département (tout dans un seul message d'ouverture chaleureux — ne pas demander l'adresse email)
 Q2. "Décris-moi ton besoin en quelques phrases, sans te soucier d'être précis pour l'instant."
 Q3. Type de besoin — propose EXACTEMENT ces 3 options numérotées :
-   1. Évolution d'un outil existant
-   2. Nouvel outil
-   3. Nouveau besoin / nouveau processus
+   1. Évolution sur un outil existant
+   2. Évolution d'un processus métier
+   3. Demande d'un nouvel outil
 Q4. Savez-vous déjà quel(s) outil(s) ce besoin va concerner ? (si oui, lesquels — si non, pas de problème)
 Q5. Qui sont les utilisateurs ou équipes impactés par ce besoin ?
 Q6. Quelle est la situation actuelle ? Comment les choses fonctionnent-elles aujourd'hui ?
-Q7. Quelle est la fréquence du problème ? (plusieurs fois par jour / quotidien / hebdomadaire / occasionnel mais critique)
+Q7. Quelle est la fréquence du problème ou du besoin ? (plusieurs fois par jour / quotidien / hebdomadaire / occasionnel mais critique)
 Q8. Qu'est-ce qui se passe concrètement si ce besoin n'est pas traité ? (bloquant / perte de temps significative / risque qualité / autre)
 Q9. Quelles sont les fonctionnalités ou règles absolument non négociables pour cette solution ?
 Q10. Y a-t-il des contraintes à prendre en compte ? (budget, technique, réglementaire, dépendances) — NE PAS mentionner les projets structurants ici, ne pas orienter sur les plannings.
@@ -145,21 +145,22 @@ Si l'utilisateur envoie "/générer" ou confirme vouloir générer, retourne UNI
 
 RÈGLES JSON CRITIQUES :
 - Ne JAMAIS inventer ou halluciner des informations non mentionnées par le demandeur
-- Si une information n'a pas été donnée, mettre une chaîne vide "" ou tableau vide []
-- titre_projet : titre synthétique et professionnel (5-8 mots max)
+- Si une information n'a pas été donnée, écrire "Non spécifié par le demandeur" (jamais laisser vide ou "")
+- Tous les champs texte commencent par une majuscule au premier mot
+- titre_projet : titre synthétique et professionnel (5-8 mots max), commence par une majuscule
 - contexte : ce qui pousse le demandeur à faire sa demande + fréquence + impact (synthèse narrative)
 - perimetre_besoin : ce que le demandeur souhaite (le besoin exprimé) en phrases claires
-- personnes_impactees : liste des équipes/utilisateurs mentionnés
-- process_actuel : fonctionnement actuel si existant, sinon ""
-- perte_si_non_developpe : conséquences concrètes si non traité
-- roi : retour sur investissement attendu avec chiffres si mentionnés
-- criteres_succes : comment le succès sera mesuré
+- personnes_impactees : liste des équipes/utilisateurs mentionnés, sinon "Non spécifié par le demandeur"
+- process_actuel : fonctionnement actuel si existant, sinon "Non spécifié par le demandeur"
+- perte_si_non_developpe : conséquences concrètes si non traité, sinon "Non spécifié par le demandeur"
+- roi : retour sur investissement attendu avec chiffres si mentionnés, sinon "Non spécifié par le demandeur"
+- criteres_succes : comment le succès sera mesuré, sinon "Non spécifié par le demandeur"
 - contraintes : inclure systématiquement les conflits potentiels avec les chantiers Sylius/ERP si la deadline est entre avril et septembre 2026
 - questions_ouvertes : 5 à 8 questions TRÈS précises, contextualisées Bongenie, révélant les zones d'ombre, directement actionnables en atelier de cadrage
 - questions_demandeur : tableau vide [] — sera rempli par le demandeur dans l'interface
 - niveau_maturite : "faible" / "moyen" / "élevé" selon clarté besoin + exigences + mesurabilité
 - recommandation_ba : évaluation professionnelle incluant les risques liés au contexte Bongenie (chantiers en cours, dépendances SI), prochaine étape recommandée
-- Tous les champs texte en français, phrases complètes`;
+- Tous les champs texte en français, phrases complètes, première lettre en majuscule`;
 
 // ─── TYPING INDICATOR ────────────────────────────────────────────────────────
 const TypingDots = () => (
@@ -206,7 +207,7 @@ const EditableField = ({ value, onChange, multiline = false, placeholder = "" })
 };
 
 // ─── SPEC DOCUMENT ───────────────────────────────────────────────────────────
-function SpecDoc({ spec, onUpdate, validated, onValidate }) {
+function SpecDoc({ spec, onUpdate, validated, onValidate, onUnvalidate }) {
   const m = MAT[spec.niveau_maturite] || MAT.moyen;
   const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
 
@@ -246,7 +247,6 @@ function SpecDoc({ spec, onUpdate, validated, onValidate }) {
           {[
             ["Demandeur", spec.prenom_nom],
             ["Département", spec.departement],
-            ["Email", spec.email],
             ["Date", today],
           ].map(([k, v]) => (
             <div key={k}>
@@ -269,9 +269,12 @@ function SpecDoc({ spec, onUpdate, validated, onValidate }) {
           </button>
         </div>
       ) : (
-        <div style={{ background: "#ecfdf5", borderLeft: "4px solid #059669", padding: "12px 24px", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ background: "#ecfdf5", borderLeft: "4px solid #059669", padding: "12px 24px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <span style={{ fontSize: 16 }}>✅</span>
-          <span style={{ fontSize: 12, color: "#065f46", fontFamily: "sans-serif", fontWeight: 600 }}>Document validé — prêt à être transmis au pôle Transformation &amp; Technologie</span>
+          <span style={{ flex: 1, fontSize: 12, color: "#065f46", fontFamily: "sans-serif", fontWeight: 600 }}>Document validé — prêt à être transmis au pôle Transformation &amp; Technologie</span>
+          <button onClick={onUnvalidate} style={{ background: "transparent", color: "#065f46", border: "1px solid #059669", padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "sans-serif", whiteSpace: "nowrap" }}>
+            ✏️ Revenir en mode édition
+          </button>
         </div>
       )}
 
@@ -782,7 +785,7 @@ export default function GraceDefinitionBesoin() {
 
               {phase === "done" && spec && (
                 <div style={{ animation: "fadeUp 0.4s ease" }}>
-                  <SpecDoc spec={spec} onUpdate={setSpec} validated={validated} onValidate={handleValidate} />
+                  <SpecDoc spec={spec} onUpdate={setSpec} validated={validated} onValidate={handleValidate} onUnvalidate={() => setValidated(false)} />
                   {validated && (
                     <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
                       <button onClick={downloadPDF} style={{ flex: 1, minWidth: 180, background: "#1a3a2a", color: "white", border: "none", padding: "13px 20px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", transition: "background 0.15s" }}
