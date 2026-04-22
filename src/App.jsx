@@ -1,165 +1,154 @@
 import { useState, useRef, useEffect } from "react";
 
 // ─── SYSTEM PROMPT — BONGENIE ENRICHI ───────────────────────────────────────
-const SYSTEM_PROMPT = `Tu es un Business Analyst senior expert en spécification fonctionnelle, rattaché au pôle Transformation & Technologie de Bongenie Grieder. Tu as 15 ans d'expérience dans des projets de transformation digitale, retail et IT.
+// ─── SYSTEM PROMPT — GRACE CONVERSATIONNEL ──────────────────────────────────
+const SYSTEM_PROMPT = `Tu es Grace, Business Analyst senior rattachée au pôle Transformation & Technologie de Bongenie. Tu as 15 ans d'expérience en transformation digitale retail et IT. Tu es reconnue pour ta capacité à aider les équipes métier à formaliser leurs besoins de façon claire et exploitable.
 
-Ton rôle est de mener un entretien de cadrage structuré avec un demandeur métier Bongenie afin de produire une première ébauche de spécification fonctionnelle à destination du pôle Transformation & Technologie.
+Aujourd'hui tu joues le rôle de BA qui accompagne un demandeur métier dans la première phase de recueil de son besoin fonctionnel. Ton objectif est de produire, au terme de la conversation, une spécification fonctionnelle V1 complète à destination du pôle T&T.
 
-═══════════════════════════════════════════
-CONTEXTE BONGENIE GRIEDER — À UTILISER ACTIVEMENT
-═══════════════════════════════════════════
+═══════════════════════════════
+CONTEXTE BONGENIE — À UTILISER ACTIVEMENT
+═══════════════════════════════
 
 DÉPARTEMENTS ET MISSIONS :
-- Transformation & Technologie (T&T) : pôle centralisant l'IT applicatif, l'infra, les Business Analysts, les chefs de projet et la DSI. Au cœur de tous les sujets d'évolution des outils, de la sécurité et de la gouvernance de la donnée. C'est le pôle destinataire de toutes les spécifications fonctionnelles.
-- Commercial : inclut le e-commerce, l'omnicanalité et les acheteurs. Pilote l'offre, la stratégie commerciale et le chiffre d'affaires. Un data analyst aide au pilotage des offres.
-- Marketing : comprend le pôle créatif (offline, campagnes institutionnelles), CRM, Traffic Manager, copywriting, trade marketing, communication et événementiel.
-- Logistique : gère tous les flux produits — enrichissements e-commerce, traitement de la marchandise, expédition des commandes, réassort.
-- Finance : regroupe les activités comptables, le service clients et la paie (payroll).
-- Direction et assistantes de direction.
-- Ressources Humaines.
-- Forces de vente : tout le personnel en magasin et en restauration.
+- Transformation & Technologie (T&T) : IT applicatif, infra, BA, chefs de projet, DSI. Destinataire de toutes les specs.
+- Commercial : e-commerce, omnicanalité, acheteurs, data analyst. Pilotage de l'offre et du CA.
+- Marketing : pôle créatif offline, CRM, Traffic Manager, copywriting, trade marketing, événementiel.
+- Logistique : flux produits, enrichissements e-commerce, expédition, réassort.
+- Finance : comptabilité, service clients, payroll.
+- Direction, RH, Forces de vente (magasin, restauration).
 
-STACK SI BONGENIE :
+STACK SI :
 Architecture centrale :
-- Business Central : ERP — système cœur (en rouge dans le schéma = critique). Gère clients, commandes, retours, stocks, prix, autorisations (FAC, KDO, CBRW, VOUCHER). Montée de version majeure dès mai 2026.
-- ESB : Bus d'intégration — orchestre TOUS les flux entre Business Central, Sylius, Salesforce et les autres outils. Toute évolution touchant plusieurs outils passe par l'ESB.
-- Sylius : Moteur e-commerce (hub central) — reçoit les mises à jour client, commandes, stocks, prix depuis l'ESB. Montée de version majeure avril–septembre 2026.
-
-CRM & Communication :
-- Salesforce : CRM — emails transactionnels, préférences communication, wallet update
-- Postman : Emulation & Testing
-- Captain Wallet : Mobile Wallet
+- Business Central : ERP cœur — prix, stocks, commandes, clients, autorisations (FAC, KDO, CBRW, VOUCHER). Montée de version dès mai 2026.
+- ESB : bus d'intégration — orchestre les flux entre outils. Impliqué uniquement si plusieurs outils communiquent entre eux.
+- Sylius : moteur e-commerce. Montée de version majeure avril–septembre 2026.
 
 Produit & Contenu :
-- Akeneo : PIM (Product Information Management) — données produit froides vers Sylius, enrichissement mutuel avec Keepeek
-- Bee App : Génération de contenu produit par IA → alimente Akeneo
-- Keepeek : Data Asset Management — assets marketing
-- Middleware : transformation et archivage des informations produit et médias
-- Sanity : CMS / Content — menus, home pages, landing pages, contenu personnalisé
-- Lokalise : Traductions
+- Akeneo : PIM — données produit froides. Enrichissement mutuel avec Keepeek.
+- Bee App : génération contenu produit IA → alimente Akeneo.
+- Keepeek : Data Asset Management — assets marketing.
+- Middleware : transformation et archivage data produit et médias.
+- Sanity : CMS / Content — menus, home pages, landing pages, contenu personnalisé.
+- Lokalise : traductions.
 
 E-commerce & Merchandising :
-- Attraqt : Merchandising / Searchandising — ranking produits, recommandations, résultats de recherche
-- Channable : Product feed management
-- Redirection.io : Gestion des redirections URL
-- Optimi : Content Delivery Network
-- Bridge : Store Locator — infos magasins, horaires, événements
+- Attraqt : Merchandising / Searchandising — ranking produits, recommandations, résultats de recherche.
+- Channable : product feed management.
+- Redirection.io : gestion des redirections URL.
+- Optimi : Content Delivery Network.
+- Bridge : Store Locator — infos magasins, horaires.
+
+CRM & Communication :
+- Salesforce : CRM — emails transactionnels, préférences, wallet.
+- Captain Wallet : Mobile Wallet.
+- Postman : Emulation & Testing.
 
 Paiement & Finance :
-- Safepay : Paiement + 3D Secure
-- CRIF : Solvency check (vérification solvabilité)
+- Safepay : paiement + 3D Secure.
+- CRIF : solvency check.
 
 Monitoring & Infrastructure :
-- New Relic : Monitoring
-- Azure : Blob Storage
-- Clarity : Heatmaps & Sessions recording
-- Smart Tribune : FAQ dynamique et contextuelle
+- New Relic : monitoring.
+- Azure : Blob Storage.
+- Clarity : Heatmaps & Sessions.
+- Smart Tribune : FAQ dynamique.
 
 Pricing :
-- ODR (Offre De Remise) : fichier de gestion des prix rouges
-- Sites : 603 (full price) et 605 (outlet)
+- ODR (Offre De Remise) : fichier gestion des prix rouges.
+- 603 : site e-commerce full price.
+- 605 : site e-commerce outlet.
 
-RÈGLES D'UTILISATION DU SI :
-- Tout besoin touchant les prix, commandes, stocks, clients → dépendance Business Central. Vérifier si l'ESB est impliqué uniquement si le flux concerne plusieurs outils simultanément.
-- Tout besoin e-commerce (front, tunnel d'achat, compte client) → dépendance Sylius. Sylius n'implique pas systématiquement l'ESB — ne pas les associer automatiquement.
-- Tout besoin produit / catalogue / enrichissement → dépendance Akeneo, potentiellement Keepeek et Bee App
-- Tout besoin contenu / pages / CMS → dépendance Sanity
-- Tout besoin CRM / email / fidélité → dépendance Salesforce
-- Tout besoin merchandising / recherche → dépendance Attraqt
-- L'ESB n'est impliqué que si le besoin nécessite des flux entre plusieurs outils du SI — ne pas le mentionner systématiquement
+RÈGLES DE DÉPENDANCES SI :
+- Besoin touchant prix, stocks, commandes, clients → Business Central.
+- Besoin e-commerce front, tunnel d'achat, compte client → Sylius.
+- Besoin catalogue produit, enrichissement → Akeneo, Keepeek, Bee App.
+- Besoin contenu, pages, CMS → Sanity.
+- Besoin CRM, email, fidélité → Salesforce.
+- Besoin merchandising, recherche → Attraqt.
+- Besoin multi-outils → ESB impliqué — complexité accrue.
+- L'ESB n'est pas systématiquement impliqué — uniquement si flux inter-systèmes.
 
-PROJETS STRUCTURANTS EN COURS (ne pas ignorer lors de l'évaluation des contraintes) :
-- Restructuration organisationnelle : Q1 2026 (en cours)
-- Montée de version majeure Sylius : avril–septembre 2026
-- Montée de version ERP : dès mai 2026
-⚠️ Tout besoin avec une deadline entre avril et septembre 2026 est potentiellement en conflit avec ces chantiers. Le signaler systématiquement dans les contraintes et la recommandation BA.
+PROJETS STRUCTURANTS 2026 :
+- Restructuration organisationnelle : Q1 2026 (en cours).
+- Montée de version Sylius : avril–septembre 2026 ⚠️
+- Montée de version ERP (Business Central) : dès mai 2026 ⚠️
+→ Toute deadline entre avril et septembre 2026 est potentiellement en conflit. À signaler explicitement quand la deadline est mentionnée — pas avant.
 
-VOCABULAIRE INTERNE BONGENIE :
-- Prix noir : prix plein (sans remise)
-- Prix rouge : prix remisé
-- ODR : Offre De Remise — fichier de gestion des prix rouges
-- 603 : site e-commerce full price
-- 605 : site e-commerce outlet
-- T&T : pôle Transformation & Technologie
+VOCABULAIRE INTERNE :
+- Prix noir : prix plein (sans remise).
+- Prix rouge : prix remisé.
+- ODR : Offre De Remise — fichier gestion des prix rouges.
+- 603 : site full price. 605 : site outlet.
+- T&T : pôle Transformation & Technologie.
+- PLP : Product Listing Page. PDP : Product Detail Page.
 
-UTILISATION DE CE CONTEXTE :
-- Si le demandeur est du Commerce → challenger sur l'impact prix noir/rouge, ODR, omnicanalité 603/605
-- Si le demandeur est de la Logistique → vérifier les flux produits impactés et les dépendances ERP
-- Si le demandeur est du Marketing → vérifier les dépendances CRM et les outils e-commerce
-- Ne JAMAIS mentionner les projets structurants avant la question Q14 sur la deadline
-- Après Q14 uniquement : si la deadline chevauche avril–septembre 2026 → signaler le conflit dans la réponse de validation
-- Utiliser le vocabulaire interne Bongenie dans tes questions et dans le document généré
-- Utiliser la réponse à Q4 (outils concernés) pour contextualiser toutes les questions suivantes
+═══════════════════════════════
+TON RÔLE ET TA POSTURE
+═══════════════════════════════
 
-═══════════════════════════════════════════
-RÈGLES DE CONDUITE DE L'ENTRETIEN
-═══════════════════════════════════════════
+Tu es un BA senior, pas un formulaire. Tu mènes une vraie conversation :
+- Tu accueilles chaleureusement le demandeur et l'invites à te décrire son besoin librement.
+- Tu écoutes, reformules ce que tu as compris, et confirmes avant d'aller plus loin.
+- Tu creuses les zones floues avec des questions ciblées — une seule à la fois.
+- Tu ne suis pas une liste de questions dans l'ordre : tu t'adaptes à ce que le métier exprime.
+- Tu utilises le contexte Bongenie pour poser des questions pertinentes et anticiper les dépendances SI.
+- Tu valides chaque information importante avant de continuer.
+- Ton ton est professionnel, bienveillant et direct — jamais condescendant.
+- Tu travailles exclusivement en français.
+- Tu ne poses jamais deux questions dans le même message.
+- Si le demandeur aborde plusieurs thèmes en une réponse, tu en prends note et tu creuses uniquement ce qui reste flou.
 
-RÈGLES STRICTES :
-- Tu poses UNE seule question à la fois, jamais plusieurs
-- Si une réponse est trop vague ou incomplète, tu challenges avant de passer à la suite
-- Tu valides chaque réponse avec une courte phrase d'accusé de réception
-- Ton ton est professionnel, direct et bienveillant
-- Tu travailles UNIQUEMENT en français
-- Tu ne poses JAMAIS deux questions dans le même message
-- Tu gardes en mémoire tout ce qui a été dit pour ne pas répéter
-- Tu utilises le contexte Bongenie pour poser des questions plus pertinentes et ciblées
+INFORMATIONS À COLLECTER au fil de la conversation (dans n'importe quel ordre) :
+- Identité : prénom, nom, département.
+- Besoin exprimé librement — tu le reformules pour valider.
+- Type de demande : évolution outil existant / évolution processus métier / nouvel outil.
+- Outils SI concernés si connus.
+- Utilisateurs et équipes impactés.
+- Situation actuelle — comment ça fonctionne aujourd'hui.
+- Fréquence du problème ou besoin.
+- Impact si non traité.
+- Exigences non négociables (must-have).
+- Contraintes : budget, technique, réglementaire, dépendances.
+- KPIs identifiés à ce stade.
+- Critères de succès de la livraison.
+- ROI attendu — même estimatif.
+- Deadline souhaitée — avec exemple concret (COMEX, opération commerciale).
+- Informations complémentaires éventuelles.
 
-ORDRE STRICT DES QUESTIONS :
-Q1. Message d'accueil : demande prénom, nom, département et adresse email professionnelle (tout dans un seul message d'ouverture chaleureux)
-Q2. "Décris-moi ton besoin en quelques phrases, sans te soucier d'être précis pour l'instant."
-Q3. Type de besoin — propose EXACTEMENT ces 3 options numérotées :
-   1. Évolution d'un outil existant
-   2. Nouvel outil
-   3. Nouveau besoin / nouveau processus
-Q4. Savez-vous déjà quel(s) outil(s) ce besoin va concerner ? (si oui, lesquels — si non, pas de problème)
-Q5. Qui sont les utilisateurs ou équipes impactés par ce besoin ?
-Q6. Quelle est la situation actuelle ? Comment les choses fonctionnent-elles aujourd'hui ?
-Q7. Quelle est la fréquence du problème ? (plusieurs fois par jour / quotidien / hebdomadaire / occasionnel mais critique)
-Q8. Qu'est-ce qui se passe concrètement si ce besoin n'est pas traité ? (bloquant / perte de temps significative / risque qualité / autre)
-Q9. Quelles sont les fonctionnalités ou règles absolument non négociables pour cette solution ?
-Q10. Y a-t-il des contraintes à prendre en compte ? (budget, technique, réglementaire, dépendances) — NE PAS mentionner les projets structurants ici, ne pas orienter sur les plannings.
-Q11. À ce stade du projet, savez-vous quels sont les KPIs identifiés pour ce nouveau besoin ?
-Q12. Quels seront les critères pour mesurer le succès de la livraison de ce nouveau besoin ?
-Q13. À ce stade du projet, pouvez-vous indiquer quel ROI est prévu sur ce besoin ? Si vous avez des chiffres, même estimatifs, ajoutez-les.
-Q14. Avez-vous une échéance précise en tête pour une première utilisation ? Par exemple une date de COMEX, une opération commerciale ou un événement particulier ?
+═══════════════════════════════
+DÉTECTION DE FIN D'ENTRETIEN
+═══════════════════════════════
 
-RÈGLE CRITIQUE SUR LA DEADLINE (Q14) :
-Après la réponse à Q14, analyse si la date mentionnée chevauche un projet structurant en cours :
-- Montée de version Sylius : avril–septembre 2026
-- Montée de version ERP (Business Central) : dès mai 2026
-- Restructuration organisationnelle : Q1 2026
-Si un conflit est détecté, le signaler DANS TA RÉPONSE DE VALIDATION de Q14, avant de passer à Q15.
-Exemple : "Merci pour cette précision. Je note que cette échéance chevauche la période de montée de version Sylius (avril–septembre 2026), ce qui pourrait impacter la disponibilité des équipes T&T. Ce point sera mentionné dans les contraintes de la spécification."
-Ne jamais mentionner les projets structurants avant Q14.
+Quand tu estimes avoir collecté suffisamment d'informations pour produire une spec V1 exploitable, propose naturellement de clore :
+"Je pense avoir une bonne compréhension de votre besoin. Souhaitez-vous ajouter quelque chose avant que je génère la spécification ?"
 
-Q15. Y a-t-il des informations importantes que vous n'avez pas pu exprimer ? (optionnel)
-
-Après avoir posé la question Q15 et reçu la réponse (ou si l'utilisateur n'a rien à ajouter), envoie UNIQUEMENT cette ligne pour signaler la fin :
+Si le demandeur confirme ou n'a rien à ajouter, envoie UNIQUEMENT :
 ###FIN###
 
-Si l'utilisateur envoie "/générer" ou confirme vouloir générer, retourne UNIQUEMENT le JSON suivant, précédé de ###SPEC### sur une ligne seule, sans aucun texte avant ni après :
+Si le demandeur envoie "/générer", génère directement la spec sans attendre.
+
+═══════════════════════════════
+GÉNÉRATION DE LA SPÉCIFICATION
+═══════════════════════════════
+
+Retourne UNIQUEMENT le JSON suivant précédé de ###SPEC### sur une ligne seule, sans aucun texte avant ni après :
 
 ###SPEC###
-{"prenom_nom":"","departement":"","email":"","type_besoin":"","titre_projet":"","contexte":"","frequence_probleme":"","impact_si_non_traite":"","perimetre_besoin":"","personnes_impactees":"","process_actuel":"","perte_si_non_developpe":"","roi":"","criteres_succes":"","contraintes":[],"questions_ouvertes":[],"questions_demandeur":[],"recommandation_ba":"","niveau_maturite":"moyen","prochaine_etape":""}
+{"prenom_nom":"","departement":"","type_besoin":"","titre_projet":"","contexte":"","perimetre_besoin":"","personnes_impactees":"","process_actuel":"","perte_si_non_developpe":"","roi":"","criteres_succes":"","contraintes":[],"questions_ouvertes":[],"questions_demandeur":[],"recommandation_ba":"","niveau_maturite":"moyen","prochaine_etape":""}
 
-RÈGLES JSON CRITIQUES :
-- Ne JAMAIS inventer ou halluciner des informations non mentionnées par le demandeur
-- Si une information n'a pas été donnée, mettre une chaîne vide "" ou tableau vide []
-- titre_projet : titre synthétique et professionnel (5-8 mots max)
-- contexte : ce qui pousse le demandeur à faire sa demande + fréquence + impact (synthèse narrative)
-- perimetre_besoin : ce que le demandeur souhaite (le besoin exprimé) en phrases claires
-- personnes_impactees : liste des équipes/utilisateurs mentionnés
-- process_actuel : fonctionnement actuel si existant, sinon ""
-- perte_si_non_developpe : conséquences concrètes si non traité
-- roi : retour sur investissement attendu avec chiffres si mentionnés
-- criteres_succes : comment le succès sera mesuré
-- contraintes : inclure systématiquement les conflits potentiels avec les chantiers Sylius/ERP si la deadline est entre avril et septembre 2026
-- questions_ouvertes : 5 à 8 questions TRÈS précises, contextualisées Bongenie, révélant les zones d'ombre, directement actionnables en atelier de cadrage
-- questions_demandeur : tableau vide [] — sera rempli par le demandeur dans l'interface
-- niveau_maturite : "faible" / "moyen" / "élevé" selon clarté besoin + exigences + mesurabilité
-- recommandation_ba : évaluation professionnelle incluant les risques liés au contexte Bongenie (chantiers en cours, dépendances SI), prochaine étape recommandée
-- Tous les champs texte en français, phrases complètes`;
+RÈGLES DE GÉNÉRATION :
+- Ne jamais inventer — uniquement ce qui a été dit pendant la conversation.
+- Si une information n'a pas été abordée : "Non spécifié par le demandeur".
+- Tous les champs commencent par une majuscule.
+- titre_projet : 5 à 8 mots, synthétique et professionnel.
+- contexte : synthèse narrative — ce qui pousse le demandeur + fréquence + impact.
+- perimetre_besoin : le besoin exprimé en phrases claires.
+- contraintes : inclure explicitement les conflits Sylius/ERP si la deadline le justifie.
+- questions_ouvertes : 5 à 8 questions précises, contextualisées Bongenie, actionnables en atelier de cadrage. Révèlent ce que le métier n'a pas su exprimer.
+- recommandation_ba : évaluation professionnelle — maturité, risques SI et organisationnels, prochaine étape. Non éditable.
+- niveau_maturite : "faible" / "moyen" / "élevé" selon clarté du besoin, complétude des exigences, mesurabilité.
+- questions_demandeur : tableau vide [] — sera rempli par le demandeur dans l'interface.`;
 
 // ─── TYPING INDICATOR ────────────────────────────────────────────────────────
 const TypingDots = () => (
@@ -206,7 +195,7 @@ const EditableField = ({ value, onChange, multiline = false, placeholder = "" })
 };
 
 // ─── SPEC DOCUMENT ───────────────────────────────────────────────────────────
-function SpecDoc({ spec, onUpdate, validated, onValidate }) {
+function SpecDoc({ spec, onUpdate, validated, onValidate, onUnvalidate }) {
   const m = MAT[spec.niveau_maturite] || MAT.moyen;
   const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
 
@@ -246,7 +235,6 @@ function SpecDoc({ spec, onUpdate, validated, onValidate }) {
           {[
             ["Demandeur", spec.prenom_nom],
             ["Département", spec.departement],
-            ["Email", spec.email],
             ["Date", today],
           ].map(([k, v]) => (
             <div key={k}>
@@ -269,9 +257,12 @@ function SpecDoc({ spec, onUpdate, validated, onValidate }) {
           </button>
         </div>
       ) : (
-        <div style={{ background: "#ecfdf5", borderLeft: "4px solid #059669", padding: "12px 24px", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ background: "#ecfdf5", borderLeft: "4px solid #059669", padding: "12px 24px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <span style={{ fontSize: 16 }}>✅</span>
-          <span style={{ fontSize: 12, color: "#065f46", fontFamily: "sans-serif", fontWeight: 600 }}>Document validé — prêt à être transmis au pôle Transformation &amp; Technologie</span>
+          <span style={{ flex: 1, fontSize: 12, color: "#065f46", fontFamily: "sans-serif", fontWeight: 600 }}>Document validé — prêt à être transmis au pôle Transformation &amp; Technologie</span>
+          <button onClick={onUnvalidate} style={{ background: "transparent", color: "#065f46", border: "1px solid #059669", padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "sans-serif", whiteSpace: "nowrap" }}>
+            ✏️ Revenir en mode édition
+          </button>
         </div>
       )}
 
@@ -440,77 +431,151 @@ function SpecDoc({ spec, onUpdate, validated, onValidate }) {
 }
 
 // ─── FEEDBACK MODAL ───────────────────────────────────────────────────────────
-function FeedbackModal({ onClose }) {
+function FeedbackModal({ onClose, spec }) {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
-  const [comment, setComment] = useState("");
+  const [questionsPertinentes, setQuestionsPertinentes] = useState(null);
+  const [specSatisfaisante, setSpecSatisfaisante] = useState(null);
+  const [pointAmeliorer, setPointAmeliorer] = useState("");
+  const [feraitAppel, setFeraitAppel] = useState(null);
+  const [commentaire, setCommentaire] = useState("");
+  const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState(null);
 
   const labels = ["", "Insuffisant", "Passable", "Correct", "Bien", "Excellent"];
 
+  const canSubmit = rating > 0;
+
+  const submit = async () => {
+    if (!canSubmit || sending) return;
+    setSending(true); setError(null);
+    try {
+      const res = await fetch("/api/feedback-entretien", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nom: spec?.prenom_nom || "—",
+          departement: spec?.departement || "—",
+          titreProjet: spec?.titre_projet || "—",
+          date: new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }),
+          questionsPertinentes: questionsPertinentes || "Non répondu",
+          specSatisfaisante: specSatisfaisante || "Non répondu",
+          pointAmeliorer: pointAmeliorer || "",
+          feraitAppel: feraitAppel || "Non répondu",
+          noteSatisfaction: rating,
+          commentaire: commentaire || "",
+        })
+      });
+      const data = await res.json();
+      if (data.success) { setSent(true); }
+      else { setError("Erreur lors de l'envoi. Réessayez."); }
+    } catch (e) {
+      setError("Erreur réseau. Réessayez.");
+    }
+    setSending(false);
+  };
+
+  const YesNo = ({ value, onChange }) => (
+    <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+      {[["Oui", "👍"], ["Non", "👎"]].map(([label, emoji]) => (
+        <span key={label} onClick={() => onChange(label)}
+          style={{ fontSize: 20, cursor: "pointer", opacity: value && value !== label ? 0.25 : 1, transition: "opacity 0.15s" }}>
+          {emoji}
+        </span>
+      ))}
+    </div>
+  );
+
+  const overlay = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 24 };
+  const modal = { background: "white", borderRadius: 12, padding: "28px 28px 24px", maxWidth: 460, width: "100%", maxHeight: "90vh", overflowY: "auto" };
+
   if (sent) return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 24 }}>
-      <div style={{ background: "white", borderRadius: 16, padding: "40px 32px", maxWidth: 400, width: "100%", textAlign: "center" }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>🙏</div>
-        <div style={{ fontSize: 18, fontWeight: 800, color: "#111827", marginBottom: 8, fontFamily: "sans-serif" }}>Merci pour votre retour !</div>
-        <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 24, fontFamily: "sans-serif", lineHeight: 1.5 }}>Votre feedback nous aide à améliorer l'agent pour mieux répondre aux besoins du pôle métier.</div>
-        <button onClick={onClose} style={{ background: "#1a3a2a", color: "white", border: "none", padding: "10px 24px", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "sans-serif" }}>Fermer</button>
+    <div style={overlay}>
+      <div style={{ ...modal, textAlign: "center", padding: "40px 32px" }}>
+        <div style={{ fontSize: 44, marginBottom: 16 }}>🙏</div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: "#111827", marginBottom: 8, fontFamily: "sans-serif" }}>Merci pour votre retour !</div>
+        <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 24, fontFamily: "sans-serif", lineHeight: 1.6 }}>Votre évaluation a bien été enregistrée et sera exploitée par le pôle T&T.</div>
+        <button onClick={onClose} style={{ background: "#1a3a2a", color: "white", border: "none", padding: "10px 28px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "sans-serif" }}>Fermer</button>
       </div>
     </div>
   );
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 24 }}>
-      <div style={{ background: "white", borderRadius: 16, padding: "32px", maxWidth: 440, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+    <div style={overlay}>
+      <div style={modal}>
+
+        {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: "#111827", fontFamily: "sans-serif", marginBottom: 4 }}>Évaluer cet entretien</div>
-            <div style={{ fontSize: 12, color: "#6b7280", fontFamily: "sans-serif" }}>Votre retour nous aide à améliorer l'agent</div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#2d5a40", fontFamily: "sans-serif", marginBottom: 4 }}>Grace — Définition du besoin</div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: "#111827", fontFamily: "sans-serif" }}>Évaluer cet entretien</div>
           </div>
-          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#9ca3af" }}>✕</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#9ca3af", flexShrink: 0 }}>✕</button>
         </div>
 
-        {/* Étoiles */}
-        <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 8 }}>
-          {[1,2,3,4,5].map(s => (
-            <span key={s} onClick={() => setRating(s)} onMouseEnter={() => setHover(s)} onMouseLeave={() => setHover(0)}
-              style={{ fontSize: 32, cursor: "pointer", transition: "transform 0.1s", transform: (hover || rating) >= s ? "scale(1.15)" : "scale(1)" }}>
-              {(hover || rating) >= s ? "⭐" : "☆"}
-            </span>
-          ))}
-        </div>
-        {(hover || rating) > 0 && (
-          <div style={{ textAlign: "center", fontSize: 13, color: "#1a3a2a", fontWeight: 600, fontFamily: "sans-serif", marginBottom: 16 }}>{labels[hover || rating]}</div>
-        )}
-
-        {/* Questions */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
-          {[
-            "Les questions posées étaient pertinentes",
-            "Le document généré reflète bien mon besoin",
-            "Je referai appel à cet agent pour une prochaine demande",
-          ].map((q, i) => {
-            const [v, setV] = useState(null);
-            return (
-              <div key={i} style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 12, color: "#374151", fontFamily: "sans-serif", flex: 1 }}>{q}</span>
-                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                  {["👍", "👎"].map(e => (
-                    <span key={e} onClick={() => setV(e)} style={{ fontSize: 18, cursor: "pointer", opacity: v && v !== e ? 0.3 : 1, transition: "opacity 0.15s" }}>{e}</span>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+        {/* Q1 — questions pertinentes */}
+        <div style={{ background: "#f7f5f1", borderRadius: 8, padding: "12px 14px", marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 13, color: "#374151", fontFamily: "sans-serif", flex: 1, lineHeight: 1.5 }}>Les questions posées étaient-elles pertinentes ?</span>
+          <YesNo value={questionsPertinentes} onChange={setQuestionsPertinentes} />
         </div>
 
-        <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Un commentaire libre ? (optionnel)" rows={3}
-          style={{ width: "100%", border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 12px", fontSize: 13, fontFamily: "sans-serif", resize: "none", outline: "none", color: "#374151", marginBottom: 16 }} />
+        {/* Q2 — spec satisfaisante */}
+        <div style={{ background: "#f7f5f1", borderRadius: 8, padding: "12px 14px", marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 13, color: "#374151", fontFamily: "sans-serif", flex: 1, lineHeight: 1.5 }}>La spécification fonctionnelle vous semble-t-elle satisfaisante ?</span>
+          <YesNo value={specSatisfaisante} onChange={setSpecSatisfaisante} />
+        </div>
 
-        <button onClick={() => setSent(true)} disabled={rating === 0}
-          style={{ width: "100%", background: rating > 0 ? "#1a3a2a" : "#e5e7eb", color: rating > 0 ? "white" : "#9ca3af", border: "none", padding: "12px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: rating > 0 ? "pointer" : "default", fontFamily: "sans-serif", transition: "background 0.15s" }}>
-          Envoyer mon évaluation
+        {/* Q3 — point à améliorer */}
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ fontSize: 13, color: "#374151", fontFamily: "sans-serif", marginBottom: 6, lineHeight: 1.5 }}>Si vous deviez améliorer un point dans cet entretien, quel serait-il ?</div>
+          <input value={pointAmeliorer} onChange={e => setPointAmeliorer(e.target.value)} placeholder="Optionnel — réponse courte"
+            style={{ width: "100%", border: "1px solid #e8e0d3", borderRadius: 6, padding: "8px 12px", fontSize: 13, fontFamily: "sans-serif", outline: "none", color: "#374151", background: "#f7f5f1" }} />
+        </div>
+
+        {/* Q4 — ferait appel */}
+        <div style={{ background: "#f7f5f1", borderRadius: 8, padding: "12px 14px", marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 13, color: "#374151", fontFamily: "sans-serif", flex: 1, lineHeight: 1.5 }}>Feriez-vous de nouveau appel à Grace pour définir votre besoin ?</span>
+          <YesNo value={feraitAppel} onChange={setFeraitAppel} />
+        </div>
+
+        {/* Q5 — note étoiles */}
+        <div style={{ borderTop: "1px solid #e8e0d3", paddingTop: 16, marginBottom: 16 }}>
+          <div style={{ fontSize: 13, color: "#374151", fontFamily: "sans-serif", marginBottom: 10 }}>Quel est votre niveau de satisfaction globale de cet entretien ?</div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {[1,2,3,4,5].map(s => (
+              <span key={s} onClick={() => setRating(s)} onMouseEnter={() => setHover(s)} onMouseLeave={() => setHover(0)}
+                style={{ fontSize: 28, cursor: "pointer", transition: "transform 0.1s", transform: (hover || rating) >= s ? "scale(1.1)" : "scale(1)" }}>
+                {(hover || rating) >= s ? "⭐" : "☆"}
+              </span>
+            ))}
+            {(hover || rating) > 0 && (
+              <span style={{ fontSize: 13, color: "#2d5a40", fontWeight: 600, fontFamily: "sans-serif", marginLeft: 6 }}>{labels[hover || rating]}</span>
+            )}
+          </div>
+        </div>
+
+        {/* Commentaire libre */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 13, color: "#374151", fontFamily: "sans-serif", marginBottom: 6 }}>Commentaire libre <span style={{ color: "#9ca3af" }}>(optionnel)</span></div>
+          <textarea value={commentaire} onChange={e => setCommentaire(e.target.value)} placeholder="Un retour, une suggestion, quelque chose qui manquait…" rows={3}
+            style={{ width: "100%", border: "1px solid #e8e0d3", borderRadius: 6, padding: "8px 12px", fontSize: 13, fontFamily: "sans-serif", resize: "none", outline: "none", color: "#374151", background: "#f7f5f1" }} />
+        </div>
+
+        {/* Note confidentialité */}
+        <div style={{ fontSize: 11, color: "#9ca3af", fontFamily: "sans-serif", lineHeight: 1.6, marginBottom: 16, fontStyle: "italic" }}>
+          Ces données seront uniquement exploitées par le département T&T afin d'améliorer la qualité de ses services et répondre au mieux à vos besoins.
+        </div>
+
+        {error && <div style={{ fontSize: 12, color: "#dc2626", marginBottom: 10, fontFamily: "sans-serif" }}>⚠️ {error}</div>}
+
+        {/* Bouton envoi */}
+        <button onClick={submit} disabled={!canSubmit || sending}
+          style={{ width: "100%", background: canSubmit && !sending ? "#1a3a2a" : "#e5e7eb", color: canSubmit && !sending ? "white" : "#9ca3af", border: "none", padding: "12px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: canSubmit && !sending ? "pointer" : "default", fontFamily: "sans-serif", transition: "background 0.15s" }}>
+          {sending ? "Envoi en cours…" : "Envoyer mon évaluation"}
         </button>
+        {!canSubmit && <div style={{ fontSize: 11, color: "#b8963e", textAlign: "center", marginTop: 6, fontFamily: "sans-serif" }}>Veuillez attribuer une note étoile pour soumettre</div>}
+
       </div>
     </div>
   );
@@ -574,7 +639,7 @@ export default function GraceDefinitionBesoin() {
   const start = async () => {
     setPhase("chat"); setLoading(true); setError(null);
     try {
-      const init = [{ role: "user", content: "Bonjour, je souhaite soumettre une demande au pôle Transformation & Technologie." }];
+      const init = [{ role: "user", content: "Bonjour Grace, j'ai un besoin à te soumettre." }];
       const reply = await callClaude(init, 400);
       setHistory([...init, { role: "assistant", content: reply }]);
       setMessages([{ role: "assistant", content: reply }]);
@@ -694,7 +759,7 @@ export default function GraceDefinitionBesoin() {
     <div style={{ minHeight: "100vh", background: "#f7f5f1", fontFamily: "sans-serif", display: "flex", flexDirection: "column" }}>
       <style>{`*{box-sizing:border-box} @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}} textarea:focus,input:focus{outline:none}`}</style>
 
-      {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} />}
+      {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} spec={spec} />}
 
       {/* Header */}
       <div style={{ background: "#1a3a2a", padding: "15px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10, flexShrink: 0 }}>
@@ -720,7 +785,7 @@ export default function GraceDefinitionBesoin() {
               <div style={{ fontSize: 11, color: "#7a756e", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 24 }}>Définition du besoin</div>
               <div style={{ width: 40, height: 2, background: "#b8963e", margin: "0 auto 24px" }}></div>
               <p style={{ fontSize: 13, color: "#7a756e", lineHeight: 1.65, margin: "0 auto", maxWidth: 400 }}>
-                Un entretien guidé pour structurer votre besoin et produire une première ébauche de spécification fonctionnelle à destination du pôle Transformation & Technologie.
+                Une conversation avec Grace, votre BA senior, pour structurer votre besoin et produire une première ébauche de spécification fonctionnelle à destination du pôle Transformation & Technologie.
               </p>
             </div>
 
@@ -728,7 +793,7 @@ export default function GraceDefinitionBesoin() {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 28 }}>
               {[
-                ["🎯", "Entretien guidé", "Questions ciblées pour structurer votre besoin, même s'il est peu défini."],
+                ["💬", "Conversation naturelle", "Exprimez votre besoin librement — Grace s'adapte à vous, pas l'inverse."],
                 ["✏️", "Document éditable", "Relisez et corrigez la spécification générée avant de la valider."],
                 ["📄", "Téléchargement", "Exportez le document finalisé à destination du pôle T&T."],
               ].map(([icon, title, desc]) => (
@@ -782,7 +847,7 @@ export default function GraceDefinitionBesoin() {
 
               {phase === "done" && spec && (
                 <div style={{ animation: "fadeUp 0.4s ease" }}>
-                  <SpecDoc spec={spec} onUpdate={setSpec} validated={validated} onValidate={handleValidate} />
+                  <SpecDoc spec={spec} onUpdate={setSpec} validated={validated} onValidate={handleValidate} onUnvalidate={() => setValidated(false)} />
                   {validated && (
                     <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
                       <button onClick={downloadPDF} style={{ flex: 1, minWidth: 180, background: "#1a3a2a", color: "white", border: "none", padding: "13px 20px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", transition: "background 0.15s" }}
@@ -838,7 +903,7 @@ export default function GraceDefinitionBesoin() {
                 </div>
                 {!readyToGenerate && (
                   <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 7, textAlign: "center" }}>
-                    Tapez <strong>/générer</strong> à tout moment pour produire la spécification
+                    Tapez <strong>/générer</strong> à tout moment pour produire la spécification — ou laissez Grace vous le proposer naturellement
                   </div>
                 )}
               </div>
